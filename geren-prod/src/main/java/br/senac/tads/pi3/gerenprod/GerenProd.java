@@ -16,6 +16,14 @@ public class GerenProd {
         System.out.println("Valor de i++: " + i++);
         
         System.out.println("Correção de bug");
+        
+        if(i%2==0) {
+            System.out.println("numero par");
+    }else
+            System.out.println("Numero impar");
     }
+        
+    
     
 }
+
