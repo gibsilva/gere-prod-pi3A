@@ -14,6 +14,12 @@ public class GerenProd {
         System.out.println("TEste Maven");
         int i = 0;
         System.out.println("Valor de i++: " + i++);
-    }
+        
+        if(i%2==0) {
+            System.out.println("numero par");
+    }else
+            System.out.println("Numero impar");
     
+    
+}
 }
