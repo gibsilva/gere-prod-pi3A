@@ -14,6 +14,18 @@
         <id>GiSilva-senac</id>
         <name>Gi Silva</name>
         </developer>
+        <developer>
+        <id>Adriane-senac</id>
+        <name>Adriane Alexandre</name>
+        </developer>
+        <developer>
+        <id>Marcel-senac</id>
+        <name>Marcel Cardoso</name>
+        </developer>
+        <developer>
+        <id>JoaoMarcos-senac</id>
+        <name>Joao Marcos</name>
+        </developer>
     </developers>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
