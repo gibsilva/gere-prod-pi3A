@@ -5,6 +5,7 @@
  */
 package DAO;
 
+import Controller.ProdutoController;
 import Model.CategoriaModel;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

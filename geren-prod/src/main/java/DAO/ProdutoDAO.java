@@ -57,7 +57,7 @@ public class ProdutoDAO {
         return null;
     }
 
-    public void inserir(ProdutoModel p) {
+    public static void inserir(ProdutoModel p) {
         ConexaoBd conexao = new ConexaoBd();
         String sql = " INSERT INTO produto "
                 + "(Nome, Descricao, preco_compra, preco_venda, quantidade, dt_cadastro)"
@@ -81,7 +81,7 @@ public class ProdutoDAO {
         }
     }
 
-    public void atualizar(ProdutoModel p) {
+    public static void atualizar(ProdutoModel p) {
         ConexaoBd conexao = new ConexaoBd();
         String sql = "UPTADE produto SET"
                 + "(Nome, Descricao, preco_compra, preco_venda, quantidade, dt_cadastro)"
@@ -104,7 +104,7 @@ public class ProdutoDAO {
         }
     }
 
-    public void excluir(int idProduto) {
+    public static void excluir(int idProduto) {
         ConexaoBd conexao = new ConexaoBd();
         String sql = "DELETE FROM produto WHERE ID = " + idProduto;
 
