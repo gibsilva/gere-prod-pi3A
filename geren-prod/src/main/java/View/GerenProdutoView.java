@@ -1,7 +1,15 @@
 package View;
-import DAO.CategoriaDAO;
+import Controller.CategoriaController;
+import Controller.ProdutoController;
 import Model.CategoriaModel;
+import Model.ProdutoModel;
+import java.awt.HeadlessException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -14,17 +22,21 @@ import javax.swing.JOptionPane;
  * @author Marcel
  */
 public class GerenProdutoView extends javax.swing.JFrame {
-
+    CategoriaController categoriaController = new CategoriaController();
+    ProdutoController produtoController = new ProdutoController();
     /**
      * Creates new form Frame
      */
     public GerenProdutoView() {
         initComponents();
+        carregarComboCategoria();
         
-        CategoriaDAO categoria = new CategoriaDAO();
-        for(CategoriaModel c: categoria.listarTodos()){
-           ComboCategoria.addItem(c);
-            
+        carregarDadosTabela();
+    }
+    
+    private void carregarComboCategoria(){        
+        for(CategoriaModel c: categoriaController.carregarCategorias()){
+           ComboCategoria.addItem(c);           
         }
     }
 
@@ -57,22 +69,23 @@ public class GerenProdutoView extends javax.swing.JFrame {
         jLabel7 = new javax.swing.JLabel();
         ComboCategoria = new javax.swing.JComboBox<>();
         BtnSalvar = new javax.swing.JButton();
+        BtnCancelar = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         TextIdPesq = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
         TxtNomePesq = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
-        ComboCategoriaPesq = new javax.swing.JComboBox<>();
         jLabel11 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblDados = new javax.swing.JTable();
         jPanel3 = new javax.swing.JPanel();
         btnExcluir = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         BtnPesquisar = new javax.swing.JButton();
         BtnLimpar = new javax.swing.JButton();
+        txtCategoriaPesq = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -114,6 +127,13 @@ public class GerenProdutoView extends javax.swing.JFrame {
         BtnSalvar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BtnSalvarActionPerformed(evt);
+            }
+        });
+
+        BtnCancelar.setText("Cancelar");
+        BtnCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnCancelarActionPerformed(evt);
             }
         });
 
@@ -160,6 +180,8 @@ public class GerenProdutoView extends javax.swing.JFrame {
                         .addContainerGap())))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(BtnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(BtnSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(24, 24, 24))
         );
@@ -197,8 +219,10 @@ public class GerenProdutoView extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(BtnSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(BtnSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(BtnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(25, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Registro", jPanel1);
@@ -209,11 +233,9 @@ public class GerenProdutoView extends javax.swing.JFrame {
 
         jLabel10.setText("Categoria:");
 
-        ComboCategoriaPesq.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
         jLabel11.setText("Resultado:");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblDados.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -239,15 +261,25 @@ public class GerenProdutoView extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane2.setViewportView(jTable1);
-        if (jTable1.getColumnModel().getColumnCount() > 0) {
-            jTable1.getColumnModel().getColumn(0).setResizable(false);
-            jTable1.getColumnModel().getColumn(0).setPreferredWidth(50);
+        jScrollPane2.setViewportView(tblDados);
+        if (tblDados.getColumnModel().getColumnCount() > 0) {
+            tblDados.getColumnModel().getColumn(0).setResizable(false);
+            tblDados.getColumnModel().getColumn(0).setPreferredWidth(50);
         }
 
         btnExcluir.setText("Excluir");
+        btnExcluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExcluirActionPerformed(evt);
+            }
+        });
 
         btnEditar.setText("Editar");
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -276,8 +308,18 @@ public class GerenProdutoView extends javax.swing.JFrame {
         jPanel3Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnEditar, btnExcluir});
 
         BtnPesquisar.setText("Pesquisar");
+        BtnPesquisar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnPesquisarActionPerformed(evt);
+            }
+        });
 
         BtnLimpar.setText("Limpar");
+        BtnLimpar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnLimparActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -324,7 +366,7 @@ public class GerenProdutoView extends javax.swing.JFrame {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel10)
-                            .addComponent(ComboCategoriaPesq, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txtCategoriaPesq, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(27, 27, 27))
@@ -354,7 +396,7 @@ public class GerenProdutoView extends javax.swing.JFrame {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel10)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(ComboCategoriaPesq, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtCategoriaPesq, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(11, 11, 11)
                 .addComponent(jLabel11)
@@ -403,12 +445,191 @@ public class GerenProdutoView extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_ComboCategoriaActionPerformed
 
-    private void BtnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnSalvarActionPerformed
-//SERVE PARA PEGAR O ID DA CATEGORIA NA COMBOBOX
-//        CategoriaModel categoria = (CategoriaModel) ComboCategoria.getSelectedItem();
+    public int ehDisponivel(){
+        if(CboxDesabilitado.isSelected())
+            return 1;
+        else
+            return 0;
+    }
     
+    public void verificaDisponivel(int n){
+        if(n == 1)
+            CboxDesabilitado.setSelected(false);
+        else
+            CboxDesabilitado.setSelected(true);
+    }
+    
+    private void BtnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnSalvarActionPerformed
+        int id;
+        
+        if(validarCamposObrigatorios()){
+            if(TxtID.getText().equals(""))
+                id = 0;
+            else
+                id = Integer.parseInt(TxtID.getText());
+            
+            ProdutoModel produto = new ProdutoModel(id, TxtNome.getText(), TextDescricao.getText(),
+                    Double.parseDouble(TxtVlrCompra.getText()), Double.parseDouble(TxtVlrVenda.getText()), 
+                    Integer.parseInt(SpnQuantidade.getValue().toString()), getDataAtual(), ComboCategoria.getSelectedItem().toString(),
+                    ehDisponivel());
+            
+            if(id == 0){
+                if(produtoController.cadastrarProduto(produto)){
+                    JOptionPane.showMessageDialog(null, "Produto cadastrado com sucesso.");
+                    carregarDadosTabela();
+                    jTabbedPane1.setSelectedIndex(1);
+                    limparCamposCadastro();
+                } else{
+                    JOptionPane.showMessageDialog(null, "Ocorreu um erro ao cadastrar.");
+                } 
+            } else{
+                produtoController.atualizarProduto(produto);
+                carregarDadosTabela();
+                jTabbedPane1.setSelectedIndex(1);
+                limparCamposCadastro();
+                JOptionPane.showMessageDialog(null, "Produto alterado com sucesso!");                
+            }                
+        } else{
+            JOptionPane.showMessageDialog(null, "Atenção, preencher todos os campos para salvar o produto.");
+        }    
     }//GEN-LAST:event_BtnSalvarActionPerformed
 
+    private void BtnLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnLimparActionPerformed
+        limparCamposPesquisa();
+        carregarDadosTabela();
+    }//GEN-LAST:event_BtnLimparActionPerformed
+
+    private void BtnPesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnPesquisarActionPerformed
+        int id = 0;
+        if(!TextIdPesq.getText().equals("")){
+            id = Integer.parseInt(TextIdPesq.getText());
+        }
+        
+        carregarDadosTabelaComFiltro(produtoController.filtroProduto(TxtNomePesq.getText(), txtCategoriaPesq.getText(), id));
+    }//GEN-LAST:event_BtnPesquisarActionPerformed
+
+    private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
+        int linha = tblDados.getSelectedRow();
+        
+        if(linha == -1){
+            JOptionPane.showMessageDialog(null, "Por favor selecione um registro antes de excluir.");
+            return;
+        }
+        
+        int id = Integer.parseInt(tblDados.getValueAt(linha, 0).toString());
+        int resposta = JOptionPane.showConfirmDialog(null, "Deseja realmente excluir o produto selecionado?", "Excluir", JOptionPane.YES_NO_OPTION);
+        
+        if(resposta == JOptionPane.YES_OPTION){
+            try{
+                produtoController.excluirProduto(id);
+                carregarDadosTabela();
+            }
+            catch(HeadlessException e){
+                JOptionPane.showMessageDialog(null, "Ocorreu um erro ao excluir!");
+            }
+        }
+    }//GEN-LAST:event_btnExcluirActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        int linha = tblDados.getSelectedRow();
+        
+        if(linha == -1){
+            JOptionPane.showMessageDialog(null, "Por favor selecione um registro antes de editar.");
+            return;
+        }
+        
+        int id = Integer.parseInt(tblDados.getValueAt(linha, 0).toString());
+        jTabbedPane1.setSelectedIndex(0);
+        
+        preencherCampos(produtoController.getPorId(id));       
+        
+    }//GEN-LAST:event_btnEditarActionPerformed
+
+    private void BtnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnCancelarActionPerformed
+        limparCamposCadastro();
+    }//GEN-LAST:event_BtnCancelarActionPerformed
+    
+    public void preencherCampos(ProdutoModel p){
+        TxtID.setText(Integer.toString(p.getIdProduto()));
+        TxtNome.setText(p.getNome());
+        TxtVlrCompra.setText(Double.toString(p.getPrecoCompra()));
+        TxtVlrVenda.setText(Double.toString(p.getPrecoVenda()));
+        SpnQuantidade.setValue(p.getQuantidade());
+        verificaDisponivel(p.getDisponivel());
+        TextDescricao.setText(p.getDescricao());
+    }
+    
+    private boolean validarCamposObrigatorios(){
+        return !(TxtNome.getText().equals("") || TxtVlrCompra.getText().equals("") || TxtVlrVenda.getText().equals("")
+                || SpnQuantidade.getValue().toString().equals("0") || TextDescricao.getText().equals(""));
+    }
+    
+    public String getDataAtual(){
+        Date data = new Date(System.currentTimeMillis());  
+        SimpleDateFormat formatarDate = new SimpleDateFormat("yyyy-MM-dd");
+        return formatarDate.format(data).toString();
+    }
+    
+    public void lerDadosTabela(){
+        DefaultTableModel modelo = (DefaultTableModel) tblDados.getModel();
+        modelo.setNumRows(0);
+        
+        for(ProdutoModel p: produtoController.listarTodos()){
+            modelo.addRow(new Object[]{
+                p.getIdProduto(),
+                p.getNome(),
+                p.getNomeCategoria(),
+                p.getPrecoCompra(),
+                p.getQuantidade()
+            });
+        }
+    }
+    
+    public void lerDadosTabelaComFiltro(List<ProdutoModel> produtosFiltrados){
+        DefaultTableModel modelo = (DefaultTableModel) tblDados.getModel();
+        modelo.setNumRows(0);
+        
+        for(ProdutoModel p: produtosFiltrados){
+            modelo.addRow(new Object[]{
+                p.getIdProduto(),
+                p.getNome(),
+                p.getNomeCategoria(),
+                p.getPrecoCompra(),
+                p.getQuantidade()
+            });
+        }
+    }
+    
+    public void carregarDadosTabela(){
+        DefaultTableModel modelo = (DefaultTableModel) tblDados.getModel();
+        tblDados.setRowSorter(new TableRowSorter(modelo));
+        
+        lerDadosTabela();
+    }
+    
+    public void carregarDadosTabelaComFiltro(List<ProdutoModel> produtosFiltrados){
+        DefaultTableModel modelo = (DefaultTableModel) tblDados.getModel();
+        tblDados.setRowSorter(new TableRowSorter(modelo));
+        
+        lerDadosTabelaComFiltro(produtosFiltrados);
+    }
+    
+    public void limparCamposCadastro(){
+        TxtID.setText("");
+        TxtNome.setText("");
+        TxtVlrCompra.setText("");
+        TxtVlrVenda.setText("");
+        TextDescricao.setText("");
+        SpnQuantidade.setValue(0);
+        CboxDesabilitado.setSelected(false);
+    }
+    
+    public void limparCamposPesquisa(){
+        TextIdPesq.setText("");
+        TxtNomePesq.setText("");
+        txtCategoriaPesq.setText("");
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -438,6 +659,10 @@ public class GerenProdutoView extends javax.swing.JFrame {
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -448,12 +673,12 @@ public class GerenProdutoView extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton BtnCancelar;
     private javax.swing.JButton BtnLimpar;
     private javax.swing.JButton BtnPesquisar;
     private javax.swing.JButton BtnSalvar;
     private javax.swing.JCheckBox CboxDesabilitado;
     private javax.swing.JComboBox<Object> ComboCategoria;
-    private javax.swing.JComboBox<String> ComboCategoriaPesq;
     private javax.swing.JSpinner SpnQuantidade;
     private javax.swing.JTextArea TextDescricao;
     private javax.swing.JTextField TextIdPesq;
@@ -483,6 +708,7 @@ public class GerenProdutoView extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tblDados;
+    private javax.swing.JTextField txtCategoriaPesq;
     // End of variables declaration//GEN-END:variables
 }

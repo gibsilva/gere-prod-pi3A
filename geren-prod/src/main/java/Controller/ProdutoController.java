@@ -8,66 +8,62 @@ import DAO.ProdutoDAO;
  *
  * @author Adrianne
  */
+
 public class ProdutoController {
-    public static String cadastrarProduto(ProdutoModel produto){
-        String resposta = null;
-        
-        if(resposta == null){
-            try{
-                ProdutoDAO.inserir(produto);
-                
-            }catch (Exception e){
-                
-                e.printStackTrace();
-                resposta = "Erro na fonte de dados";
-            }
-        }
-        return resposta;
-    }
-    
-    public static String atualizarProduto(ProdutoModel produto){
-        String resposta = null;
-       
-        if(resposta == null){
-            try{
-                ProdutoDAO.atualizar(produto);
-            } catch (Exception e){
-                e.printStackTrace();
-                resposta = "Erro na fonte de dados";
-            }
-        }
-        return resposta;
-    }
-    
-    public static String excluirProduto(Integer id){
-        String resposta = null;
-        
-        try{
-            ProdutoDAO.excluir(id);
-        } catch (Exception e){
-            e.printStackTrace();
-            resposta = "Erro na fonte de dados";
-        }
-        return resposta;
-    }
 
-    public List<ProdutoModel> procurarProduto(String nomeProduto, String nomeCategoria, int id) {
-        ProdutoDAO produtoDAO = new ProdutoDAO();
-        List<ProdutoModel> listaResposta = null;
+    ProdutoDAO produtoDao = new ProdutoDAO();
 
+    public boolean cadastrarProduto(ProdutoModel produto) {
         try {
-            if ((nomeProduto == null || "".equals(nomeProduto)) && 
-                (nomeCategoria == null || "".equals(nomeCategoria)) &&
-                (id == 0 || "".equals(id))) {
-                listaResposta = produtoDAO.listarTodos();
-            } else {
-                listaResposta = produtoDAO.pesquisarProduto(nomeProduto, nomeCategoria, id);
-            }
-        } catch (Exception e) {
+            produtoDao.inserir(produto);
+            return true;
+        } catch (NullPointerException e) {
             e.printStackTrace();
-
+            return false;
         }
-        return listaResposta;
+    }
+
+    public List<ProdutoModel> listarTodos() {
+        try {
+            return produtoDao.listarTodos();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<ProdutoModel> filtroProduto(String nomeProduto, String nomeCategoria, int id) {
+        try {
+            return produtoDao.pesquisarProduto(nomeProduto, nomeCategoria, id);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void excluirProduto(int id) {
+        try {
+            produtoDao.excluir(id);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void atualizarProduto(ProdutoModel p) {
+        try {
+            produtoDao.atualizar(p);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ProdutoModel getPorId(int id) {
+        try {
+            return produtoDao.getPorId(id);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

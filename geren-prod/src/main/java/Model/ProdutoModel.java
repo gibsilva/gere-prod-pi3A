@@ -20,11 +20,12 @@ public class ProdutoModel {
     private double precoCompra;
     private double precoVenda;
     private int quantidade;
-    private Date dtCadastro;
+    private String dtCadastro;
     private String nomeCategoria;
+    private int disponivel;
     
     public ProdutoModel( int idProduto, String nome, String descricao,
-            double precoCompra, double precoVenda, int quantidade, Date dtCadastro, String nomeCategoria){
+            double precoCompra, double precoVenda, int quantidade, String dtCadastro, String nomeCategoria, int disponivel){
         
         this.idProduto = idProduto;
         this.nome = nome;
@@ -34,6 +35,7 @@ public class ProdutoModel {
         this.quantidade = quantidade;
         this.dtCadastro = dtCadastro;
         this.nomeCategoria = nomeCategoria;
+        this.disponivel = disponivel;
     }
 
     /**
@@ -123,14 +125,14 @@ public class ProdutoModel {
     /**
      * @return the dtCadastro
      */
-    public Date getDtCadastro() {
+    public String getDtCadastro() {
         return dtCadastro;
     }
 
     /**
      * @param dtCadastro the dtCadastro to set
      */
-    public void setDtCadastro(Date dtCadastro) {
+    public void setDtCadastro(String dtCadastro) {
         this.dtCadastro = dtCadastro;
     }
     
@@ -140,6 +142,14 @@ public class ProdutoModel {
     
     public void setNomeCategoria(String nomeCategoria){
         this.nomeCategoria = nomeCategoria;
+    }
+    
+    public int getDisponivel(){
+        return this.disponivel;
+    }
+    
+    public void setDisponivel(int disponivel){
+        this.disponivel = disponivel;
     }
 }
     
